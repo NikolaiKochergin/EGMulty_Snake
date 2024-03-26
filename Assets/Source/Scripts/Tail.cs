@@ -5,19 +5,29 @@ namespace Source.Scripts
 {
     public class Tail : MonoBehaviour
     {
-        [SerializeField] private Transform _head;
-        [SerializeField] private List<Transform> _details;
+        [SerializeField] private Transform _detailPrefab;
         [SerializeField] private float _detailDistance = 1;
-        [SerializeField] private float _snakeSpeed = 2;
         
-        private List<Vector3> _positionHistory = new List<Vector3>();
+        private readonly List<Vector3> _positionHistory = new List<Vector3>();
+        private readonly List<Transform> _details = new List<Transform>();
+        private Transform _head;
+        private float _snakeSpeed = 2f;
 
-        private void Awake()
+        public void Init(Transform head, float speed, int detailCount)
         {
+            _head = head;
+            _snakeSpeed = speed;
+            _details.Add(transform);
             _positionHistory.Add(_head.position);
+            _positionHistory.Add(transform.position);
+            
+            SetDetailCount(detailCount);
+        }
 
+        public void Destroy()
+        {
             foreach (Transform detail in _details) 
-                _positionHistory.Add(detail.position);
+                Destroy(detail.gameObject);
         }
 
         private void Update()
@@ -39,9 +49,54 @@ namespace Source.Scripts
                 _details[i].position =
                     Vector3.Lerp(_positionHistory[i + 1], _positionHistory[i], distance / _detailDistance);
 
-                Vector3 direction = (_positionHistory[i] - _positionHistory[i + 1]).normalized;
-                _details[i].position += direction * _snakeSpeed * Time.deltaTime;
+                // Vector3 direction = (_positionHistory[i] - _positionHistory[i + 1]).normalized;
+                // _details[i].position += direction * _snakeSpeed * Time.deltaTime;
             }
+        }
+
+        private void SetDetailCount(int detailCount)
+        {
+            if(detailCount == _details.Count + 1)
+                return;
+
+            int diff = _details.Count - 1 - detailCount;
+
+            if (diff < 1)
+            {
+                for (int i = 0; i < -diff; i++)
+                {
+                    AddDetail();
+                }
+            }
+            else
+            {
+                for (int i = 0; i < diff; i++)
+                {
+                    RemoveDetail();
+                }
+            }
+        }
+
+        private void AddDetail()
+        {
+            Vector3 position = _details[^1].position;
+            Transform detail = Instantiate(_detailPrefab, position, Quaternion.identity);
+            _details.Insert(0, detail);
+            _positionHistory.Add(position);
+        }
+
+        private void RemoveDetail()
+        {
+            if (_details.Count <= 1)
+            {
+                Debug.Log("Пытаемся удалить деталь которой нет.");
+                return;
+            }
+
+            Transform detail = _details[0];
+            _details.Remove(detail);
+            Destroy(detail.gameObject);
+            _positionHistory.RemoveAt(_positionHistory.Count - 1);
         }
     }
 }
