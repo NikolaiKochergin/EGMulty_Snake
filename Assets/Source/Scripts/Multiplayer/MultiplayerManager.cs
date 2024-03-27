@@ -76,13 +76,30 @@ namespace Source.Scripts.Multiplayer
         #endregion
 
         #region Enemy
+
+        private Dictionary<string, RemoteInput> _enemies = new Dictionary<string, RemoteInput>();
         
         private void CreateEnemy(string key, Player player)
         {
+            Vector3 position = new Vector3(player.x, 0, player.z);
+            Snake snake = Instantiate(_snakePrefab, position, Quaternion.identity);
+            snake.Init(player.d);
+            RemoteInput enemy = snake.gameObject.AddComponent<RemoteInput>();
+            enemy.Init(player, snake);
+            
+            _enemies.Add(key, enemy);
         }
 
         private void RemoveEnemy(string key, Player value)
         {
+            if (_enemies.ContainsKey(key) == false)
+            {
+                Debug.LogWarning($"Attempt to delete a non-existent enemy by key {key}");
+                return;
+            }
+            RemoteInput enemy = _enemies[key];
+            _enemies.Remove(key);
+            enemy.Destroy();
         }
         
         #endregion

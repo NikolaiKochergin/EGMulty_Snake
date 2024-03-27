@@ -56,7 +56,7 @@ namespace Source.Scripts
                 Destroy(detail.gameObject);
         }
 
-        private void SetDetailCount(int detailCount)
+        public void SetDetailCount(int detailCount)
         {
             if(detailCount == _details.Count - 1)
                 return;

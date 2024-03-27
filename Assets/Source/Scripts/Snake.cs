@@ -30,20 +30,29 @@ namespace Source.Scripts
             Destroy(gameObject);
         }
 
+        public void SetDetailCount(int value) => 
+            _tail.SetDetailCount(value);
+
+        public void SetRotation(Vector3 value)
+        {
+            SetTargetRotation(value);
+            _head.eulerAngles = _targetDirection;
+        }
+
+        public void SetTargetRotation(Vector3 value) =>
+            _targetDirection = value - _head.position;
+
+        public void GetMoveInfo(out Vector3 position) => 
+            position = transform.position;
+
+        private void Move() => 
+            transform.position += _head.forward * Time.deltaTime * _speed;
+
         private void Rotate() =>
             _head.rotation = Quaternion
                 .RotateTowards(
                     _head.rotation,
                     Quaternion.LookRotation(_targetDirection),
                     _rotateSpeed * Time.deltaTime);
-
-        private void Move() => 
-            transform.position += _head.forward * Time.deltaTime * _speed;
-
-        public void LookAt(Vector3 cursorPosition) =>
-            _targetDirection = cursorPosition - _head.position;
-
-        public void GetMoveInfo(out Vector3 position) => 
-            position = transform.position;
     }
 }

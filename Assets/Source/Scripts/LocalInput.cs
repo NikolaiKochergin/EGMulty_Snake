@@ -7,6 +7,7 @@ namespace Source.Scripts
     public class LocalInput : MonoBehaviour
     {
         [SerializeField] private Transform _cursor;
+        [SerializeField] private float _cameraOffsetY;
 
         private MultiplayerManager _multiplayerManager;
         private Snake _snake;
@@ -19,6 +20,8 @@ namespace Source.Scripts
             _snake = snake;
             _camera = Camera.main;
             _plane = new Plane(Vector3.up,Vector3.zero);
+            
+            _snake.gameObject.AddComponent<CameraTracker>().Init(_camera.transform, _cameraOffsetY);
         }
 
         private void Update()
@@ -27,7 +30,7 @@ namespace Source.Scripts
                 return;
             
             MoveCursor();
-            _snake.LookAt(_cursor.position);
+            _snake.SetTargetRotation(_cursor.position);
 
             SendMove();
         }
