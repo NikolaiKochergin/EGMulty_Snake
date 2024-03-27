@@ -56,7 +56,7 @@ namespace Source.Scripts
 
         private void SetDetailCount(int detailCount)
         {
-            if(detailCount == _details.Count + 1)
+            if(detailCount == _details.Count - 1)
                 return;
 
             int diff = _details.Count - 1 - detailCount;
