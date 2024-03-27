@@ -21,7 +21,7 @@ namespace Source.Scripts
         public void Init(int detailCount)
         {
             _tail = Instantiate(_tailPrefab, transform.position, Quaternion.identity);
-            _tail.Init(_head, _speed, detailCount);
+            _tail.Init(_head, detailCount);
         }
 
         public void Destroy()
@@ -42,5 +42,8 @@ namespace Source.Scripts
 
         public void LookAt(Vector3 cursorPosition) =>
             _targetDirection = cursorPosition - _head.position;
+
+        public void GetMoveInfo(out Vector3 position) => 
+            position = transform.position;
     }
 }
