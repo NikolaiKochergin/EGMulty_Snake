@@ -60,17 +60,21 @@ namespace Source.Scripts.Multiplayer
         #endregion
 
         #region Player
-        
+
+        [SerializeField] private PlayerAim _playerAimPrefab;
         [SerializeField] private LocalInput _localInputPrefab;
         [SerializeField] private Snake _snakePrefab;
         
         private void CreatePlayer(Player player)
         {
             Vector3 position = new Vector3(player.x, 0, player.z);
-            Snake snake = Instantiate(_snakePrefab, position, Quaternion.identity);
+            Quaternion rotation = Quaternion.identity;
+            Snake snake = Instantiate(_snakePrefab, position, rotation);
             snake.Init(player.d);
+            PlayerAim aim = Instantiate(_playerAimPrefab, position, rotation);
+            aim.Init(snake.Speed);
             LocalInput localInput = Instantiate(_localInputPrefab);
-            localInput.Init(snake);
+            localInput.Init(aim, player, snake);
         }
         
         #endregion
