@@ -135,7 +135,6 @@ MonoBehaviour:
   _tailPrefab: {fileID: 1521784573074112146, guid: bc39f71e713e9704abef3cc83a64d367,
     type: 3}
   _speed: 6
-  _rotateSpeed: 90
 --- !u!1001 &1267596965188173398
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -16,11 +16,8 @@ namespace Source.Scripts
             player.OnChange += OnPlayerChange;
         }
 
-        public void Destroy()
-        {
+        private void OnDestroy() => 
             _player.OnChange -= OnPlayerChange;
-            _snake.Destroy();
-        }
 
         private void OnPlayerChange(List<DataChange> changes)
         {

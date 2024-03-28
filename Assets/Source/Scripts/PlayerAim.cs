@@ -4,15 +4,20 @@ namespace Source.Scripts
 {
     public class PlayerAim : MonoBehaviour
     {
-        [SerializeField] private float _rotateSpeed = 90f;
-        
         private Vector3 _targetDirection = Vector3.forward;
         private float _speed;
+        private float _rotateSpeed;
 
-        public void Init(float speed) => 
+        public void Init(float speed, float rotateSpeed)
+        {
             _speed = speed;
+            _rotateSpeed = rotateSpeed;
+        }
 
-        public void SetTargetDirection(Vector3 pointToLook) => 
+        public void Destroy() => 
+            Destroy(gameObject);
+
+        public void SetTarget(Vector3 pointToLook) => 
             _targetDirection = pointToLook - transform.position;
 
         public void GetMoveInfo(out Vector3 position) => 

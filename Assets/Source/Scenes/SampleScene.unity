@@ -1936,6 +1936,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2061,6 +2062,18 @@ MonoBehaviour:
     mipBias: 0
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b9ec76e313e436780c3f5e077692652, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &346872506
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10134,11 +10147,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _colyseusSettings: {fileID: 11400000, guid: 925df7b2d792f6e4bb9ed8781a9288fd, type: 2}
+  _gameSettings: {fileID: 11400000, guid: 364d606c997822145b48873def33abb7, type: 2}
+  _mainCamera: {fileID: 330585548}
+  _snakePrefab: {fileID: 3460387579237066723, guid: 78009533f9c9bbc4c901b2255dbe1db7,
+    type: 3}
   _playerAimPrefab: {fileID: -59437727076922942, guid: bc32d19c3cc1bbf469208a82e6c45e33,
     type: 3}
   _localInputPrefab: {fileID: 5859387674084847437, guid: a0939a7fd61bd7f49b5f7d4852f00a4d,
-    type: 3}
-  _snakePrefab: {fileID: 3460387579237066723, guid: 78009533f9c9bbc4c901b2255dbe1db7,
     type: 3}
 --- !u!4 &2013412837
 Transform:

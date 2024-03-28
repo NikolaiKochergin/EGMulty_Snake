@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Colyseus.Schema;
 using Source.Scripts.Multiplayer;
+using Source.Scripts.StaticData;
 using UnityEngine;
 
 namespace Source.Scripts
@@ -8,41 +8,36 @@ namespace Source.Scripts
     public class LocalInput : MonoBehaviour
     {
         [SerializeField] private Transform _cursor;
-        [SerializeField] private float _cameraOffsetY;
+        [SerializeField]private PlayerAim _playerAimPrefab;
 
         private MultiplayerManager _multiplayerManager;
-        private PlayerAim _playerAim;
-        private Player _player;
-        private Snake _snake;
         private Camera _camera;
         private Plane _plane;
+        private PlayerAim _playerAim;
 
-        public void Init(PlayerAim aim, Player player, Snake snake)
+        public void Init(Transform snake, PlayerStaticData playerSettings)
         {
             _multiplayerManager = MultiplayerManager.Instance;
-            _playerAim = aim;
-            _player = player;
-            _snake = snake;
             _camera = Camera.main;
             _plane = new Plane(Vector3.up,Vector3.zero);
-            _snake.gameObject.AddComponent<CameraTracker>().Init(_camera.transform, _cameraOffsetY);
-            _player.OnChange += OnPlayerChange;
+            _playerAim = Instantiate(_playerAimPrefab, snake.position, snake.rotation);
+            _playerAim.Init(playerSettings.Speed, playerSettings.RotateSpeed);
         }
 
         public void Destroy()
         {
-            _player.OnChange -= OnPlayerChange;
-            _snake.Destroy();
+            _playerAim.Destroy();
+            Destroy(gameObject);
         }
 
         private void Update()
         {
-            if (!Input.GetMouseButton(0)) 
-                return;
+            if (Input.GetMouseButton(0))
+            {
+                MoveCursor();
+                _playerAim.SetTarget(_cursor.position);
+            }
             
-            MoveCursor();
-            _playerAim.SetTargetDirection(_cursor.position);
-
             SendMove();
         }
 
@@ -64,32 +59,6 @@ namespace Source.Scripts
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
             if (_plane.Raycast(ray, out float distance)) 
                 _cursor.position = ray.GetPoint(distance);
-        }
-
-        private void OnPlayerChange(List<DataChange> changes)
-        {
-            Vector3 position = _snake.transform.position;
-            
-            foreach (DataChange change in changes)
-            {
-                switch (change.Field)
-                {
-                    case "x":
-                        position.x = (float) change.Value;
-                        break;
-                    case "z":
-                        position.z = (float) change.Value;
-                        break;
-                    case "d":
-                        _snake.SetDetailCount((byte)change.Value);
-                        break;
-                    default:
-                        Debug.LogWarning($"The {change.Field} field change is not being processed");
-                        break;
-                }
-            }
-            
-            _snake.SetRotation(position);
         }
     }
 }

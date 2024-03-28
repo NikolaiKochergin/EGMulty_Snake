@@ -6,17 +6,16 @@ namespace Source.Scripts
     {
         [SerializeField] private Transform _head;
         [SerializeField] private Tail _tailPrefab;
-        [SerializeField] private float _speed = 2f;
 
         private Tail _tail;
-
-        public float Speed => _speed;
+        private float _speed;
         
         private void Update() => 
             Move();
 
-        public void Init(int detailCount)
+        public void Init(int detailCount, float moveSpeed)
         {
+            _speed = moveSpeed;
             _tail = Instantiate(_tailPrefab, transform.position, Quaternion.identity);
             _tail.Init(_head, detailCount);
         }

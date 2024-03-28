@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Colyseus;
+using Source.Scripts.StaticData;
 using UnityEngine;
 
 namespace Source.Scripts.Multiplayer
@@ -20,17 +21,23 @@ namespace Source.Scripts.Multiplayer
             Connection();
         }
 
+        protected override void OnApplicationQuit()
+        {
+            base.OnApplicationQuit();
+            LeaveRoom();
+        }
+
+        public void SendMessage(string key, Dictionary<string, object> data) => 
+            _room.Send(key, data);
+
         private async void Connection()
         {
             _room = await client.JoinOrCreate<State>(GameRoomName);
             _room.OnStateChange += OnChange;
         }
 
-        private void OnChange(State state, bool isfirststate)
+        private void OnChange(State state, bool isFirstState)
         {
-            if(isfirststate == false)
-                return;
-            
             _room.OnStateChange -= OnChange;
             
             state.players.ForEach((key, player) =>
@@ -40,58 +47,69 @@ namespace Source.Scripts.Multiplayer
                 else
                     CreateEnemy(key, player);
             });
-
+            
             _room.State.players.OnAdd += CreateEnemy;
             _room.State.players.OnRemove += RemoveEnemy;
         }
 
-        protected override void OnApplicationQuit()
+        private void LeaveRoom()
         {
-            base.OnApplicationQuit();
-            LeaveRoom();
-        }
-
-        public void LeaveRoom() => 
+            RemovePlayer();
             _room?.Leave();
-
-        public void SendMessage(string key, Dictionary<string, object> data) => 
-            _room.Send(key, data);
+        }
 
         #endregion
 
         #region Player
 
-        [SerializeField] private PlayerAim _playerAimPrefab;
-        [SerializeField] private LocalInput _localInputPrefab;
+        [SerializeField] private GameSettings _gameSettings;
+        [SerializeField] private CameraTracker _mainCamera;
         [SerializeField] private Snake _snakePrefab;
+        [SerializeField] private LocalInput _localInputPrefab;
+
+        private Snake _playerSnake;
+        private LocalInput _playerLocalInput;
         
         private void CreatePlayer(Player player)
         {
             Vector3 position = new Vector3(player.x, 0, player.z);
             Quaternion rotation = Quaternion.identity;
-            Snake snake = Instantiate(_snakePrefab, position, rotation);
-            snake.Init(player.d);
-            PlayerAim aim = Instantiate(_playerAimPrefab, position, rotation);
-            aim.Init(snake.Speed);
-            LocalInput localInput = Instantiate(_localInputPrefab);
-            localInput.Init(aim, player, snake);
+            
+            _playerSnake = Instantiate(_snakePrefab, position, rotation);
+            _playerSnake.Init(player.d, _gameSettings.PlayerSettings.Speed);
+            
+            RemoteInput playerRemoteInput = _playerSnake.gameObject.AddComponent<RemoteInput>();
+            playerRemoteInput.Init(player, _playerSnake);
+            
+            _playerLocalInput = Instantiate(_localInputPrefab);
+            _playerLocalInput.Init(_playerSnake.transform, _gameSettings.PlayerSettings);
+            
+            _mainCamera.Init(_playerSnake.transform, _gameSettings.CameraOffsetY);
+        }
+
+        private void RemovePlayer()
+        {
+            _playerLocalInput.Destroy();
+            _playerSnake.Destroy();
         }
         
         #endregion
 
         #region Enemy
 
-        private Dictionary<string, RemoteInput> _enemies = new Dictionary<string, RemoteInput>();
+        private readonly Dictionary<string, Snake> _enemies = new Dictionary<string, Snake>();
         
         private void CreateEnemy(string key, Player player)
         {
             Vector3 position = new Vector3(player.x, 0, player.z);
-            Snake snake = Instantiate(_snakePrefab, position, Quaternion.identity);
-            snake.Init(player.d);
-            RemoteInput enemy = snake.gameObject.AddComponent<RemoteInput>();
-            enemy.Init(player, snake);
             
-            _enemies.Add(key, enemy);
+            Snake snake = Instantiate(_snakePrefab, position, Quaternion.identity);
+            snake.Init(player.d, _gameSettings.PlayerSettings.Speed);
+            
+            RemoteInput remoteInput = snake.gameObject.AddComponent<RemoteInput>();
+            remoteInput.Init(player, snake);
+            
+            _enemies.Add(key, snake);
         }
 
         private void RemoveEnemy(string key, Player value)
@@ -101,7 +119,7 @@ namespace Source.Scripts.Multiplayer
                 Debug.LogWarning($"Attempt to delete a non-existent enemy by key {key}");
                 return;
             }
-            RemoteInput enemy = _enemies[key];
+            Snake enemy = _enemies[key];
             _enemies.Remove(key);
             enemy.Destroy();
         }
