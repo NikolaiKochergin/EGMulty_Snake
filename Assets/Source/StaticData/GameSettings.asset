@@ -15,4 +15,20 @@ MonoBehaviour:
   _playerSettings:
     _speed: 6
     _rotateSpeed: 90
+    _materialSetups:
+    - _head: {fileID: 2100000, guid: ca0bfee60be59c84e957f4448dcdd4dd, type: 2}
+      _detail: {fileID: 2100000, guid: f124670bcbe846f4a84aed8d8a3eadfb, type: 2}
+      _tail: {fileID: 2100000, guid: 4dcc02e132975144589a413848807e63, type: 2}
+    - _head: {fileID: 2100000, guid: 4d03f93a4943b9846a533216503b0dbf, type: 2}
+      _detail: {fileID: 2100000, guid: c10f07ed4dbd321418eb3e8912b1bb69, type: 2}
+      _tail: {fileID: 2100000, guid: ced71c5f80183534a94ad8b5b45b43e3, type: 2}
+    - _head: {fileID: 2100000, guid: 7d8299fe0046dfd46abd06d72e788c2e, type: 2}
+      _detail: {fileID: 2100000, guid: acf939f7dd454844a961c602f1d967a9, type: 2}
+      _tail: {fileID: 2100000, guid: 29e53f283bd53b04f85b09cc24b699fe, type: 2}
+    - _head: {fileID: 2100000, guid: 8096ad40e127046409e356fb3ec3b9fe, type: 2}
+      _detail: {fileID: 2100000, guid: 820222377c475d446a9abff4b4e17149, type: 2}
+      _tail: {fileID: 2100000, guid: ec41b092663db5c4e842f9a429479dbe, type: 2}
+    - _head: {fileID: 2100000, guid: 33dd23fba39272140bd8bac58d95b7e1, type: 2}
+      _detail: {fileID: 2100000, guid: 7d0c7284edafab44a813b1fe46d11507, type: 2}
+      _tail: {fileID: 2100000, guid: 54938cda3b9f75944bf826e493121d8a, type: 2}
   _cameraOffsetY: 16

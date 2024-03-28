@@ -76,7 +76,8 @@ namespace Source.Scripts.Multiplayer
             Quaternion rotation = Quaternion.identity;
             
             _playerSnake = Instantiate(_snakePrefab, position, rotation);
-            _playerSnake.Init(player.d, _gameSettings.PlayerSettings.Speed);
+            int materialIndex = player.c % _gameSettings.PlayerSettings.MaterialSetups.Count;
+            _playerSnake.Init(player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex]);
             
             RemoteInput playerRemoteInput = _playerSnake.gameObject.AddComponent<RemoteInput>();
             playerRemoteInput.Init(player, _playerSnake);
@@ -104,7 +105,8 @@ namespace Source.Scripts.Multiplayer
             Vector3 position = new Vector3(player.x, 0, player.z);
             
             Snake snake = Instantiate(_snakePrefab, position, Quaternion.identity);
-            snake.Init(player.d, _gameSettings.PlayerSettings.Speed);
+            int materialIndex = player.c % _gameSettings.PlayerSettings.MaterialSetups.Count;
+            snake.Init(player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex]);
             
             RemoteInput remoteInput = snake.gameObject.AddComponent<RemoteInput>();
             remoteInput.Init(player, snake);

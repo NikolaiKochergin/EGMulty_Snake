@@ -1,23 +1,26 @@
-﻿using UnityEngine;
+﻿using Source.Scripts.StaticData;
+using UnityEngine;
 
 namespace Source.Scripts
 {
     public class Snake : MonoBehaviour
     {
-        [SerializeField] private Transform _head;
+        [SerializeField] private MaterialSetter _headModel;
         [SerializeField] private Tail _tailPrefab;
 
+        private Transform _head;
         private Tail _tail;
         private float _speed;
         
         private void Update() => 
             Move();
 
-        public void Init(int detailCount, float moveSpeed)
+        public void Init(int detailCount, float moveSpeed, MaterialSetup materialSetup)
         {
             _speed = moveSpeed;
+            _head = _headModel.transform;
             _tail = Instantiate(_tailPrefab, transform.position, Quaternion.identity);
-            _tail.Init(_head, detailCount);
+            _tail.Init(_headModel, detailCount, materialSetup);
         }
 
         public void Destroy()

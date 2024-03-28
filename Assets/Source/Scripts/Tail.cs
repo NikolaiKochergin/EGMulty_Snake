@@ -1,17 +1,35 @@
 ﻿using System.Collections.Generic;
+using Source.Scripts.StaticData;
 using UnityEngine;
 
 namespace Source.Scripts
 {
     public class Tail : MonoBehaviour
     {
-        [SerializeField] private Transform _detailPrefab;
+        [SerializeField] private MaterialSetter _selfMaterialSetter;
+        [SerializeField] private MaterialSetter _detailPrefab;
         [SerializeField] private float _detailDistance = 1;
         
         private readonly List<Transform> _details = new List<Transform>();
         private readonly List<Vector3> _positionHistory = new List<Vector3>();
         private readonly List<Quaternion> _rotationHistory = new List<Quaternion>();
         private Transform _head;
+        private MaterialSetup _materialSetup;
+
+        public void Init(MaterialSetter head, int detailCount, MaterialSetup materialSetup)
+        {
+            _materialSetup = materialSetup;
+            _head = head.transform;
+            head.SetMaterial(materialSetup.Head);
+            _selfMaterialSetter.SetMaterial(materialSetup.Tail);
+            _details.Add(transform);
+            _positionHistory.Add(_head.position);
+            _rotationHistory.Add(_head.rotation);
+            _positionHistory.Add(transform.position);
+            _rotationHistory.Add(transform.rotation);
+            
+            SetDetailCount(detailCount);
+        }
 
         private void Update()
         {
@@ -36,18 +54,6 @@ namespace Source.Scripts
                 _details[i].position = Vector3.Lerp(_positionHistory[i + 1], _positionHistory[i], percent);
                 _details[i].rotation = Quaternion.Lerp(_rotationHistory[i + 1], _rotationHistory[i], percent);
             }
-        }
-
-        public void Init(Transform head, int detailCount)
-        {
-            _head = head;
-            _details.Add(transform);
-            _positionHistory.Add(_head.position);
-            _rotationHistory.Add(_head.rotation);
-            _positionHistory.Add(transform.position);
-            _rotationHistory.Add(transform.rotation);
-            
-            SetDetailCount(detailCount);
         }
 
         public void Destroy()
@@ -83,8 +89,9 @@ namespace Source.Scripts
         {
             Vector3 position = _details[^1].position;
             Quaternion rotation = _details[^1].rotation;
-            Transform detail = Instantiate(_detailPrefab, position, rotation);
-            _details.Insert(0, detail);
+            MaterialSetter detail = Instantiate(_detailPrefab, position, rotation);
+            detail.SetMaterial(_materialSetup.Detail);
+            _details.Insert(0, detail.transform);
             _positionHistory.Add(position);
             _rotationHistory.Add(rotation);
         }
