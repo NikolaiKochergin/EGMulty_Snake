@@ -10153,6 +10153,8 @@ MonoBehaviour:
     type: 3}
   _localInputPrefab: {fileID: 5859387674084847437, guid: a0939a7fd61bd7f49b5f7d4852f00a4d,
     type: 3}
+  _applePrefab: {fileID: 780164951482666336, guid: 50a62986b0ffd5c41b81534118228c75,
+    type: 3}
 --- !u!4 &2013412837
 Transform:
   m_ObjectHideFlags: 0
