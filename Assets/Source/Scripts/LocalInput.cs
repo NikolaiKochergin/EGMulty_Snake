@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Source.Scripts.Multiplayer;
 using Source.Scripts.StaticData;
@@ -14,14 +15,16 @@ namespace Source.Scripts
         private Camera _camera;
         private Plane _plane;
         private PlayerAim _playerAim;
+        private CollisionChecker _collisionChecker;
 
-        public void Init(Transform snake, PlayerStaticData playerSettings)
+        public void Init(Transform snakeHead, PlayerStaticData playerSettings)
         {
             _multiplayerManager = MultiplayerManager.Instance;
             _camera = Camera.main;
             _plane = new Plane(Vector3.up,Vector3.zero);
-            _playerAim = Instantiate(_playerAimPrefab, snake.position, snake.rotation);
+            _playerAim = Instantiate(_playerAimPrefab, snakeHead.position, snakeHead.rotation);
             _playerAim.Init(playerSettings.Speed, playerSettings.RotateSpeed);
+            _collisionChecker = new CollisionChecker(snakeHead, playerSettings.OverlapRadius);
         }
 
         public void Destroy()
@@ -40,6 +43,9 @@ namespace Source.Scripts
             
             SendMove();
         }
+
+        private void FixedUpdate() => 
+            _collisionChecker.CheckCollision();
 
         private void SendMove()
         {

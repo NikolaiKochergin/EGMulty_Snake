@@ -87,7 +87,7 @@ namespace Source.Scripts.Multiplayer
             playerRemoteInput.Init(player, _playerSnake);
             
             _playerLocalInput = Instantiate(_localInputPrefab);
-            _playerLocalInput.Init(_playerSnake.transform, _gameSettings.PlayerSettings);
+            _playerLocalInput.Init(_playerSnake.Head.transform, _gameSettings.PlayerSettings);
             
             _mainCamera.Init(_playerSnake.transform, _gameSettings.CameraOffsetY);
         }

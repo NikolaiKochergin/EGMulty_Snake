@@ -8,17 +8,18 @@ namespace Source.Scripts
         [SerializeField] private MaterialSetter _headModel;
         [SerializeField] private Tail _tailPrefab;
 
-        private Transform _head;
         private Tail _tail;
         private float _speed;
+        
+        public Transform Head { get; private set; }
         
         private void Update() => 
             Move();
 
         public void Init(int detailCount, float moveSpeed, MaterialSetup materialSetup)
         {
+            Head = _headModel.transform;
             _speed = moveSpeed;
-            _head = _headModel.transform;
             _tail = Instantiate(_tailPrefab, transform.position, Quaternion.identity);
             _tail.Init(_headModel, detailCount, materialSetup);
         }
@@ -33,9 +34,9 @@ namespace Source.Scripts
             _tail.SetDetailCount(value);
 
         public void SetRotation(Vector3 pointToLook) => 
-            _head.LookAt(pointToLook);
+            Head.LookAt(pointToLook);
 
         private void Move() => 
-            transform.position += _head.forward * Time.deltaTime * _speed;
+            transform.position += Head.forward * Time.deltaTime * _speed;
     }
 }
