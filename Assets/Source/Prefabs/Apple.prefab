@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8181393317014312905}
   - component: {fileID: 780164951482666336}
   - component: {fileID: 6230559604157505188}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Apple
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -76,7 +76,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2308117721660109626}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -181,6 +181,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Apple
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4b29efe884c10ab49a64a847c2fcf54e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1550612116741059217, guid: 4b29efe884c10ab49a64a847c2fcf54e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1830135580500625842, guid: 4b29efe884c10ab49a64a847c2fcf54e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4603337159546281427, guid: 4b29efe884c10ab49a64a847c2fcf54e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

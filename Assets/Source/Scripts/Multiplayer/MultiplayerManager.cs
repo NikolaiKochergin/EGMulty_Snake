@@ -81,7 +81,7 @@ namespace Source.Scripts.Multiplayer
             
             _playerSnake = Instantiate(_snakePrefab, position, rotation);
             int materialIndex = player.c % _gameSettings.PlayerSettings.MaterialSetups.Count;
-            _playerSnake.Init(player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex]);
+            _playerSnake.Init(player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex], true);
             
             RemoteInput playerRemoteInput = _playerSnake.gameObject.AddComponent<RemoteInput>();
             playerRemoteInput.Init(player, _playerSnake);
@@ -90,12 +90,23 @@ namespace Source.Scripts.Multiplayer
             _playerLocalInput.Init(_playerSnake.Head.transform, _gameSettings.PlayerSettings);
             
             _mainCamera.Init(_playerSnake.transform, _gameSettings.CameraOffsetY);
+
+            _playerLocalInput.GameOverHappened += OnGameOverHappened;
+        }
+
+        private void OnGameOverHappened()
+        {
+            _playerLocalInput.GameOverHappened -= OnGameOverHappened;
+            _mainCamera.transform.parent = null;
+            RemovePlayer();
         }
 
         private void RemovePlayer()
         {
-            _playerLocalInput.Destroy();
-            _playerSnake.Destroy();
+            if(_playerLocalInput)
+                _playerLocalInput.Destroy();
+            if(_playerSnake)
+                _playerSnake.Destroy();
         }
         
         #endregion

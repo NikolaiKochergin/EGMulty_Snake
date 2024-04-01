@@ -15,9 +15,18 @@ namespace Source.Scripts
         private readonly List<Quaternion> _rotationHistory = new List<Quaternion>();
         private Transform _head;
         private MaterialSetup _materialSetup;
+        private int _playerLayer;
+        private bool _isPlayer;
 
-        public void Init(MaterialSetter head, int detailCount, MaterialSetup materialSetup)
+        public void Init(MaterialSetter head, int detailCount, MaterialSetup materialSetup, int playerLayer,
+            bool isPlayer = false)
         {
+            _playerLayer = playerLayer;
+            _isPlayer = isPlayer;
+            
+            if (isPlayer) 
+                SetPlayerLayer(gameObject);
+            
             _materialSetup = materialSetup;
             _head = head.transform;
             head.SetMaterial(materialSetup.Head);
@@ -94,6 +103,9 @@ namespace Source.Scripts
             _details.Insert(0, detail.transform);
             _positionHistory.Add(position);
             _rotationHistory.Add(rotation);
+            
+            if(_isPlayer)
+                SetPlayerLayer(detail.gameObject);
         }
 
         private void RemoveDetail()
@@ -109,6 +121,14 @@ namespace Source.Scripts
             Destroy(detail.gameObject);
             _positionHistory.RemoveAt(_positionHistory.Count - 1);
             _rotationHistory.RemoveAt(_positionHistory.Count - 1);
+        }
+
+        private void SetPlayerLayer(GameObject gameObject)
+        {
+            gameObject.layer = _playerLayer;
+            Transform[] childrens = GetComponentsInChildren<Transform>();
+            foreach (Transform children in childrens) 
+                children.gameObject.layer = _playerLayer;
         }
     }
 }

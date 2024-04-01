@@ -5,6 +5,8 @@ namespace Source.Scripts
 {
     public class Snake : MonoBehaviour
     {
+        private const string PlayerLayer = "Player";
+        
         [SerializeField] private MaterialSetter _headModel;
         [SerializeField] private Tail _tailPrefab;
 
@@ -16,12 +18,22 @@ namespace Source.Scripts
         private void Update() => 
             Move();
 
-        public void Init(int detailCount, float moveSpeed, MaterialSetup materialSetup)
+        public void Init(int detailCount, float moveSpeed, MaterialSetup materialSetup, bool isPlayer = false)
         {
+            int layerIndex = LayerMask.NameToLayer(PlayerLayer);
+            
+            if (isPlayer)
+            {
+                gameObject.layer = layerIndex;
+                Transform[] childrens = GetComponentsInChildren<Transform>();
+                foreach (Transform children in childrens) 
+                    children.gameObject.layer = layerIndex;
+            }
+            
             Head = _headModel.transform;
             _speed = moveSpeed;
             _tail = Instantiate(_tailPrefab, transform.position, Quaternion.identity);
-            _tail.Init(_headModel, detailCount, materialSetup);
+            _tail.Init(_headModel, detailCount, materialSetup, layerIndex, isPlayer);
         }
 
         public void Destroy()

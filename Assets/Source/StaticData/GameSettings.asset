@@ -15,6 +15,10 @@ MonoBehaviour:
   _playerSettings:
     _speed: 6
     _rotateSpeed: 90
+    _overlapRadius: 0.5
+    _collisionMask:
+      serializedVersion: 2
+      m_Bits: 64
     _materialSetups:
     - _head: {fileID: 2100000, guid: ca0bfee60be59c84e957f4448dcdd4dd, type: 2}
       _detail: {fileID: 2100000, guid: f124670bcbe846f4a84aed8d8a3eadfb, type: 2}

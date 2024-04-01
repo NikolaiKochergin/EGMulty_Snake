@@ -17,6 +17,8 @@ namespace Source.Scripts
         private PlayerAim _playerAim;
         private CollisionChecker _collisionChecker;
 
+        public event Action GameOverHappened;
+
         public void Init(Transform snakeHead, PlayerStaticData playerSettings)
         {
             _multiplayerManager = MultiplayerManager.Instance;
@@ -24,7 +26,8 @@ namespace Source.Scripts
             _plane = new Plane(Vector3.up,Vector3.zero);
             _playerAim = Instantiate(_playerAimPrefab, snakeHead.position, snakeHead.rotation);
             _playerAim.Init(playerSettings.Speed, playerSettings.RotateSpeed);
-            _collisionChecker = new CollisionChecker(snakeHead, playerSettings.OverlapRadius);
+            _collisionChecker = new CollisionChecker(snakeHead, playerSettings.CollisionMask, playerSettings.OverlapRadius);
+            _collisionChecker.GameOverHappened += () => GameOverHappened?.Invoke();
         }
 
         public void Destroy()
