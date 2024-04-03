@@ -23,10 +23,30 @@ namespace Source.Scripts
             Collider[] others = Physics.OverlapSphere(_snakeHead.position, _overlapRadius, _mask);
 
             foreach (Collider collider in others)
+            {
                 if (collider.TryGetComponent(out Apple apple))
+                {
                     apple.Collect();
+                }
                 else
-                    GameOver();
+                {
+                    if (collider.GetComponentInParent<Snake>())
+                    {
+                        Transform enemy = collider.transform;
+                        Vector3 enemyPosition = enemy.position;
+                        Vector3 playerPosition = _snakeHead.position;
+                        float playerAngle = Vector3.Angle(enemyPosition - playerPosition, _snakeHead.forward); 
+                        float enemyAngle = Vector3.Angle(playerPosition - enemyPosition, enemy.forward);
+                        
+                        if(playerAngle < enemyAngle + 5)
+                            GameOver();
+                    }
+                    else
+                    {
+                        GameOver();
+                    }
+                }
+            }
         }
 
         private void GameOver() => 

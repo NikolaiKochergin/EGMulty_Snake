@@ -1,4 +1,5 @@
-﻿using Source.Scripts.StaticData;
+﻿using Source.Scripts.Multiplayer;
+using Source.Scripts.StaticData;
 using UnityEngine;
 
 namespace Source.Scripts
@@ -12,14 +13,16 @@ namespace Source.Scripts
 
         private Tail _tail;
         private float _speed;
-        
+        private string _clientID;
+
         public Transform Head { get; private set; }
         
         private void Update() => 
             Move();
 
-        public void Init(int detailCount, float moveSpeed, MaterialSetup materialSetup, bool isPlayer = false)
+        public void Init(string clientID, int detailCount, float moveSpeed, MaterialSetup materialSetup, bool isPlayer = false)
         {
+            _clientID = clientID;
             int layerIndex = LayerMask.NameToLayer(PlayerLayer);
             
             if (isPlayer)
@@ -38,6 +41,10 @@ namespace Source.Scripts
 
         public void Destroy()
         {
+            DetailPositions detailPositions = _tail.GetDetailPositions().AsDetailPositionsData();
+            detailPositions.id = _clientID;
+            string json = JsonUtility.ToJson(detailPositions);
+            MultiplayerManager.Instance.SendMessage(MessageNames.gameOver, json);
             _tail.Destroy();
             Destroy(gameObject);
         }

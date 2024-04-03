@@ -29,6 +29,9 @@ namespace Source.Scripts.Multiplayer
 
         public void SendMessage(string key, Dictionary<string, object> data) => 
             _room.Send(key, data);
+        
+        public void SendMessage(string key, string data) => 
+            _room.Send(key, data);
 
         private async void Connection()
         {
@@ -43,7 +46,7 @@ namespace Source.Scripts.Multiplayer
             state.players.ForEach((key, player) =>
             {
                 if (key == _room.SessionId)
-                    CreatePlayer(player);
+                    CreatePlayer(key, player);
                 else
                     CreateEnemy(key, player);
             });
@@ -74,14 +77,14 @@ namespace Source.Scripts.Multiplayer
         private Snake _playerSnake;
         private LocalInput _playerLocalInput;
         
-        private void CreatePlayer(Player player)
+        private void CreatePlayer(string key, Player player)
         {
             Vector3 position = new Vector3(player.x, 0, player.z);
             Quaternion rotation = Quaternion.identity;
             
             _playerSnake = Instantiate(_snakePrefab, position, rotation);
             int materialIndex = player.c % _gameSettings.PlayerSettings.MaterialSetups.Count;
-            _playerSnake.Init(player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex], true);
+            _playerSnake.Init(key, player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex], true);
             
             RemoteInput playerRemoteInput = _playerSnake.gameObject.AddComponent<RemoteInput>();
             playerRemoteInput.Init(player, _playerSnake);
@@ -121,7 +124,7 @@ namespace Source.Scripts.Multiplayer
             
             Snake snake = Instantiate(_snakePrefab, position, Quaternion.identity);
             int materialIndex = player.c % _gameSettings.PlayerSettings.MaterialSetups.Count;
-            snake.Init(player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex]);
+            snake.Init(key, player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex]);
             
             RemoteInput remoteInput = snake.gameObject.AddComponent<RemoteInput>();
             remoteInput.Init(player, snake);

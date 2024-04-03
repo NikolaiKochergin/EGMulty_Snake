@@ -16,11 +16,13 @@ namespace Source.Scripts
         private Plane _plane;
         private PlayerAim _playerAim;
         private CollisionChecker _collisionChecker;
+        private Transform _snakeHead;
 
         public event Action GameOverHappened;
 
         public void Init(Transform snakeHead, PlayerStaticData playerSettings)
         {
+            _snakeHead = snakeHead;
             _multiplayerManager = MultiplayerManager.Instance;
             _camera = Camera.main;
             _plane = new Plane(Vector3.up,Vector3.zero);
@@ -45,10 +47,18 @@ namespace Source.Scripts
             }
             
             SendMove();
+            CheckExit();
         }
 
         private void FixedUpdate() => 
             _collisionChecker.CheckCollision();
+
+        private void MoveCursor()
+        {
+            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+            if (_plane.Raycast(ray, out float distance)) 
+                _cursor.position = ray.GetPoint(distance);
+        }
 
         private void SendMove()
         {
@@ -63,11 +73,10 @@ namespace Source.Scripts
             _multiplayerManager.SendMessage(MessageNames.move, data);
         }
 
-        private void MoveCursor()
+        private void CheckExit()
         {
-            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
-            if (_plane.Raycast(ray, out float distance)) 
-                _cursor.position = ray.GetPoint(distance);
+            if(Math.Abs(_snakeHead.position.x) > 128 || Math.Abs(_snakeHead.position.z) > 128)
+                GameOverHappened?.Invoke();
         }
     }
 }

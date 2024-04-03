@@ -79,19 +79,20 @@ namespace Source.Scripts
             int diff = _details.Count - 1 - detailCount;
 
             if (diff < 1)
-            {
                 for (int i = 0; i < -diff; i++)
-                {
                     AddDetail();
-                }
-            }
             else
-            {
                 for (int i = 0; i < diff; i++)
-                {
                     RemoveDetail();
-                }
-            }
+        }
+
+        public Vector3[] GetDetailPositions()
+        {
+            Vector3[] positions = new Vector3[_details.Count];
+            for (int i = 0; i < _details.Count; i++) 
+                positions[i] = _details[i].position;
+            
+            return positions;
         }
 
         private void AddDetail()
