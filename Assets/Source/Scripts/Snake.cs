@@ -1,5 +1,6 @@
 ﻿using Source.Scripts.Multiplayer;
 using Source.Scripts.StaticData;
+using TMPro;
 using UnityEngine;
 
 namespace Source.Scripts
@@ -7,7 +8,8 @@ namespace Source.Scripts
     public class Snake : MonoBehaviour
     {
         private const string PlayerLayer = "Player";
-        
+
+        [SerializeField] private TextMeshPro _loginText;
         [SerializeField] private MaterialSetter _headModel;
         [SerializeField] private Tail _tailPrefab;
 
@@ -20,9 +22,10 @@ namespace Source.Scripts
         private void Update() => 
             Move();
 
-        public void Init(string clientID, int detailCount, float moveSpeed, MaterialSetup materialSetup, bool isPlayer = false)
+        public void Init(string clientID, string login, int detailCount, float moveSpeed, MaterialSetup materialSetup, bool isPlayer = false)
         {
             _clientID = clientID;
+            _loginText.SetText(login);
             int layerIndex = LayerMask.NameToLayer(PlayerLayer);
             
             if (isPlayer)

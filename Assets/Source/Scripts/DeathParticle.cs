@@ -6,7 +6,7 @@ namespace Source.Scripts
     {
         [SerializeField] private GameObject _deathParticlePrefab;
         
-        private void OnDestroy() => 
+        private void OnDisable() => 
             Instantiate(_deathParticlePrefab, transform.position, transform.rotation);
     }
 }

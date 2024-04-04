@@ -50,24 +50,26 @@ namespace Source.Scripts.Multiplayer
         {
             _room.OnStateChange -= OnChange;
             
-            state.players.ForEach((key, player) =>
-            {
-                if (key == _room.SessionId)
-                    CreatePlayer(key, player);
-                else
-                    CreateEnemy(key, player);
-            });
+            state.players.ForEach(CreateSnake);
             
-            _room.State.players.OnAdd += CreateEnemy;
-            _room.State.players.OnRemove += RemoveEnemy;
+            CreatePlayer();
+            
+            _room.State.players.OnAdd += CreateSnake;
+            _room.State.players.OnRemove += RemoveSnake;
 
             _room.State.apples.ForEach(CreateApple);
-            _room.State.apples.OnAdd += (key, apple) => CreateApple(apple);
+            _room.State.apples.OnAdd += OnAddApple;
             _room.State.apples.OnRemove += RemoveApple;
         }
 
+        private void OnAddApple(int key, Vector2Float apple) => CreateApple(apple);
+
         private void LeaveRoom()
         {
+            _room.State.players.OnAdd -= CreateSnake;
+            _room.State.players.OnRemove -= RemoveSnake;
+            _room.State.apples.OnAdd -= OnAddApple;
+            _room.State.apples.OnRemove -= RemoveApple;
             RemovePlayer();
             _room?.Leave();
         }
@@ -84,17 +86,9 @@ namespace Source.Scripts.Multiplayer
         private Snake _playerSnake;
         private LocalInput _playerLocalInput;
         
-        private void CreatePlayer(string key, Player player)
+        private void CreatePlayer()
         {
-            Vector3 position = new Vector3(player.x, 0, player.z);
-            Quaternion rotation = Quaternion.identity;
-            
-            _playerSnake = Instantiate(_snakePrefab, position, rotation);
-            int materialIndex = player.c % _gameSettings.PlayerSettings.MaterialSetups.Count;
-            _playerSnake.Init(key, player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex], true);
-            
-            RemoteInput playerRemoteInput = _playerSnake.gameObject.AddComponent<RemoteInput>();
-            playerRemoteInput.Init(key, player, _playerSnake);
+            _playerSnake = _snakes[_room.SessionId];
             
             _playerLocalInput = Instantiate(_localInputPrefab);
             _playerLocalInput.Init(_playerSnake.Head.transform, _gameSettings.PlayerSettings);
@@ -103,48 +97,49 @@ namespace Source.Scripts.Multiplayer
 
             _playerLocalInput.GameOverHappened += OnGameOverHappened;
             
-            AddLeader(_room.SessionId, player);
         }
 
         private void OnGameOverHappened()
         {
             _playerLocalInput.GameOverHappened -= OnGameOverHappened;
-            _mainCamera.transform.parent = null;
             RemovePlayer();
         }
 
         private void RemovePlayer()
         {
+            RemoveLeader(_room.SessionId);
+            _mainCamera.transform.parent = null;
             if(_playerLocalInput)
                 _playerLocalInput.Destroy();
             if(_playerSnake)
                 _playerSnake.Destroy();
         }
-        
+
         #endregion
 
-        #region Enemy
-
-        private readonly Dictionary<string, Snake> _snakes = new Dictionary<string, Snake>();
+        #region Snake
         
-        private void CreateEnemy(string key, Player player)
+        private readonly Dictionary<string, Snake> _snakes = new Dictionary<string, Snake>();
+
+        private void CreateSnake(string key, Player player)
         {
             Vector3 position = new Vector3(player.x, 0, player.z);
-            
             Snake snake = Instantiate(_snakePrefab, position, Quaternion.identity);
             int materialIndex = player.c % _gameSettings.PlayerSettings.MaterialSetups.Count;
-            snake.Init(key, player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex]);
+            snake.Init(key, player.login, player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex], key == _room.SessionId);
             
             RemoteInput remoteInput = snake.gameObject.AddComponent<RemoteInput>();
             remoteInput.Init(key, player, snake);
             
             _snakes.Add(key, snake);
-            
             AddLeader(key, player);
         }
 
-        private void RemoveEnemy(string key, Player value)
+        private void RemoveSnake(string key, Player value)
         {
+            if(key == _room.SessionId)
+                return;
+            
             RemoveLeader(key);
             
             if (_snakes.ContainsKey(key) == false)
@@ -152,9 +147,9 @@ namespace Source.Scripts.Multiplayer
                 Debug.LogWarning($"Attempt to delete a non-existent enemy by key {key}");
                 return;
             }
-            Snake enemy = _snakes[key];
+            Snake snake = _snakes[key];
             _snakes.Remove(key);
-            enemy.Destroy();
+            snake.Destroy();
         }
         
         #endregion
