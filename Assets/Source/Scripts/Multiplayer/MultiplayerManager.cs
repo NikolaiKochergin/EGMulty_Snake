@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using Colyseus;
 using Source.Scripts.StaticData;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Source.Scripts.Multiplayer
 {
@@ -35,7 +37,12 @@ namespace Source.Scripts.Multiplayer
 
         private async void Connection()
         {
-            _room = await client.JoinOrCreate<State>(GameRoomName);
+            Dictionary<string, object> data = new Dictionary<string, object>()
+            {
+                { "login", PlayerSettings.Instance.Login },
+            };
+            
+            _room = await client.JoinOrCreate<State>(GameRoomName, data);
             _room.OnStateChange += OnChange;
         }
 
@@ -87,7 +94,7 @@ namespace Source.Scripts.Multiplayer
             _playerSnake.Init(key, player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex], true);
             
             RemoteInput playerRemoteInput = _playerSnake.gameObject.AddComponent<RemoteInput>();
-            playerRemoteInput.Init(player, _playerSnake);
+            playerRemoteInput.Init(key, player, _playerSnake);
             
             _playerLocalInput = Instantiate(_localInputPrefab);
             _playerLocalInput.Init(_playerSnake.Head.transform, _gameSettings.PlayerSettings);
@@ -95,6 +102,8 @@ namespace Source.Scripts.Multiplayer
             _mainCamera.Init(_playerSnake.transform, _gameSettings.CameraOffsetY);
 
             _playerLocalInput.GameOverHappened += OnGameOverHappened;
+            
+            AddLeader(_room.SessionId, player);
         }
 
         private void OnGameOverHappened()
@@ -116,7 +125,7 @@ namespace Source.Scripts.Multiplayer
 
         #region Enemy
 
-        private readonly Dictionary<string, Snake> _enemies = new Dictionary<string, Snake>();
+        private readonly Dictionary<string, Snake> _snakes = new Dictionary<string, Snake>();
         
         private void CreateEnemy(string key, Player player)
         {
@@ -127,20 +136,24 @@ namespace Source.Scripts.Multiplayer
             snake.Init(key, player.d, _gameSettings.PlayerSettings.Speed, _gameSettings.PlayerSettings.MaterialSetups[materialIndex]);
             
             RemoteInput remoteInput = snake.gameObject.AddComponent<RemoteInput>();
-            remoteInput.Init(player, snake);
+            remoteInput.Init(key, player, snake);
             
-            _enemies.Add(key, snake);
+            _snakes.Add(key, snake);
+            
+            AddLeader(key, player);
         }
 
         private void RemoveEnemy(string key, Player value)
         {
-            if (_enemies.ContainsKey(key) == false)
+            RemoveLeader(key);
+            
+            if (_snakes.ContainsKey(key) == false)
             {
                 Debug.LogWarning($"Attempt to delete a non-existent enemy by key {key}");
                 return;
             }
-            Snake enemy = _enemies[key];
-            _enemies.Remove(key);
+            Snake enemy = _snakes[key];
+            _snakes.Remove(key);
             enemy.Destroy();
         }
         
@@ -168,6 +181,68 @@ namespace Source.Scripts.Multiplayer
             Apple apple = _apples[vector2Float];
             _apples.Remove(vector2Float);
             apple.Destroy();
+        }
+
+        #endregion
+
+        #region Leaderboard
+
+        private class LoginScorePair
+        {
+            public string Login;
+            public float Score;
+        }
+        
+        [SerializeField] private Text _text;
+
+        private Dictionary<string, LoginScorePair> _leaders = new Dictionary<string, LoginScorePair>();
+
+        private void AddLeader(string sessionID, Player player)
+        {
+            if(_leaders.ContainsKey(sessionID))
+                return;
+            
+            _leaders.Add(sessionID, new LoginScorePair
+            {
+                Login = player.login, 
+                Score = player.score
+            });
+            
+            UpdateBoard();
+        }
+
+        private void RemoveLeader(string sessionID)
+        {
+            if(_leaders.ContainsKey(sessionID) == false)
+                return;
+            _leaders.Remove(sessionID);
+            
+            UpdateBoard();
+        }
+
+        public void UpdateScore(string sessionID, int score)
+        {
+            if(_leaders.ContainsKey(sessionID) == false)
+                return;
+
+            _leaders[sessionID].Score = score;
+            UpdateBoard();
+        }
+
+        private void UpdateBoard()
+        {
+            int topCount = Mathf.Clamp(_leaders.Count, 0, 8);
+            IEnumerable<KeyValuePair<string, LoginScorePair>> top8 = _leaders.OrderByDescending(pair => pair.Value.Score).Take(topCount);
+
+            string text = "";
+            int i = 1;
+            foreach (KeyValuePair<string,LoginScorePair> item in top8)
+            {
+                text += $"{i}. {item.Value.Login}: {item.Value.Score}\n";
+                i++;
+            }
+            
+            _text.text = text;
         }
 
         #endregion

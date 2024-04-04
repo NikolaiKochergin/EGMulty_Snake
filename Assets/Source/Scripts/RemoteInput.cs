@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Colyseus.Schema;
+using Source.Scripts.Multiplayer;
 using UnityEngine;
 
 namespace Source.Scripts
@@ -8,9 +9,11 @@ namespace Source.Scripts
     {
         private Player _player;
         private Snake _snake;
+        private string _clientID;
 
-        public void Init(Player player, Snake snake)
+        public void Init(string clientID, Player player, Snake snake)
         {
+            _clientID = clientID;
             _player = player;
             _snake = snake;
             player.OnChange += OnPlayerChange;
@@ -35,6 +38,9 @@ namespace Source.Scripts
                         break;
                     case "d":
                         _snake.SetDetailCount((byte)change.Value);
+                        break;
+                    case "score":
+                        MultiplayerManager.Instance.UpdateScore(_clientID, (ushort)change.Value);
                         break;
                     default:
                         Debug.LogWarning($"The {change.Field} field change is not being processed");
